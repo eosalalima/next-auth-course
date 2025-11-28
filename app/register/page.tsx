@@ -6,12 +6,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { passwordMatchSchema } from "@/validation/passwordMatchSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ControllerFieldState, ControllerRenderProps, useForm, UseFormStateReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import z from "zod";
 import { registerUser } from "./actions";
 
 const formSchema = z.object({
-    email: z.email("Invalid email address"),
+    email: z.string().email("Invalid email address"),
 }).and(passwordMatchSchema);
 
 export default function Register() {

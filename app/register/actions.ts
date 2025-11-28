@@ -5,8 +5,8 @@ import z from "zod";
 
 export const registerUser = async ({email, password, confirmPassword} : {email: string, password: string, confirmPassword: string}) => {
     const newUserSchema = z.object({
-        email: z.email("Invalid email address"),
-    }).and(passwordMatchSchema)
+        email: z.string().email("Invalid email address"),
+    }).and(passwordMatchSchema);
 
     const newUserValidation = newUserSchema.safeParse({email, password, confirmPassword});
 
