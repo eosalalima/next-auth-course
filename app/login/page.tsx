@@ -8,6 +8,7 @@ import { passwordSchema } from "@/validation/passwordSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { loginWithCredentials } from "./actions";
 
 const formSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -24,7 +25,10 @@ export default function Login() {
     });
 
     const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-        console.log(data);
+        await loginWithCredentials({
+            email: data.email,
+            password: data.password,
+        });
     }
     
     return (
