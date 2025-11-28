@@ -1,8 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import db from "./db/drizzle";
-import { fromTheme } from "tailwind-merge";
-import { users } from "./db/schema";
+import { users } from "./db/usersSchema";
 import { eq } from "drizzle-orm";
 import { compare } from "bcryptjs";
 
@@ -19,7 +18,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (!user) {
                 throw new Error("Incorrect credentials");
             } else {
-                const passwordCorrect = await compare(credentials.password as string, user.password);
+                const passwordCorrect = await compare(credentials.password as string, user.password!);
 
                 if (!passwordCorrect) {
                     throw new Error("Incorrect credentials");
@@ -27,6 +26,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
 
             return { id: user.id.toString(), email: user.email };
-    })],
-    // Add database connection or other NextAuth options here
+    }})],
+    
 });

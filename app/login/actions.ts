@@ -24,6 +24,6 @@ export const loginWithCredentials = async ({email, password} : {email: string, p
         });
 
     } catch(e) {
-        return { error: true, message: "An error occurred during login." };
+        return { error: true, message: "Incorrect email or password" };
     }
 };
