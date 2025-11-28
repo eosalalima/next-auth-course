@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { passwordMatchSchema } from "@/validation/passwordMatchSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import z from "zod";
+import { z } from "zod";
 import { registerUser } from "./actions";
 
 const formSchema = z.object({
