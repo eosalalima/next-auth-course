@@ -41,7 +41,9 @@ export default function Login() {
         } else {
             router.push("/my-account");
         }
-    }
+    };
+
+    const email = form.getValues("email");
     
     return (
         <main className="flex justify-center items-center min-h-screen ">
@@ -100,7 +102,7 @@ export default function Login() {
                         Don't have an account? <Link href="/register" className="text-primary underline">Register</Link>
                     </div>
                     <div className="text-muted-foreground text-sm">
-                        Forgot password? <Link href="/password-reset" className="text-primary underline">Reset my password</Link>
+                        Forgot password? <Link href={`/password-reset${email ? `?email=${encodeURIComponent(email)}` : "" }`} className="text-primary underline">Reset my password</Link>
                     </div>
                 </CardFooter>
             </Card>
