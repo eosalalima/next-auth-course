@@ -8,16 +8,18 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const formSchema = z.object({
     email: z.string().email("Invalid email address"),
 });
 
 export default function PasswordReset() {
+    const searchParams = useSearchParams();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            email: ""
+            email: decodeURIComponent(searchParams.get("email") ?? "")
         },
     });
 

@@ -14,7 +14,7 @@ import Link from "next/link";
 
 
 const formSchema = z.object({
-    email: z.string().email("Invalid email address"),
+    email: z.email("Invalid email address"),
     password: passwordSchema
 })
 
@@ -43,7 +43,7 @@ export default function Login() {
         }
     };
 
-    const email = form.getValues("email");
+    const email = form.watch("email");
     
     return (
         <main className="flex justify-center items-center min-h-screen ">
