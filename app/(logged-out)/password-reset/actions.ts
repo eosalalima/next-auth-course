@@ -25,5 +25,7 @@ export const passwordReset = async (emailAddress: string) => {
     }
 
     const passwordResetToken = randomBytes(32).toString("hex");
+    const tokenExpiry = new Date(Date.now() + 3600 * 1000); // 1 hour from now
+    
     console.log(`Password reset token for ${emailAddress}: ${passwordResetToken}`);
 }
