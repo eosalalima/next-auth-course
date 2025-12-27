@@ -4,42 +4,65 @@ import db from "./db/drizzle";
 import { users } from "./db/usersSchema";
 import { eq } from "drizzle-orm";
 import { compare } from "bcryptjs";
+import { authenticator } from "@otplib/preset-default";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     // Configure one or more authentication providers
     callbacks: {
-        jwt({token, user}) {
+        jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
             }
             return token;
         },
-        session({session, token}) {
+        session({ session, token }) {
             if (token) {
                 session.user.id = token.id as string;
             }
             return session;
-        }
+        },
     },
-    providers: [Credentials({
-        credentials: {
-            email : {}, 
-            password: {}
-        }, 
-        async authorize(credentials) {
-            const [user] = await db.select().from(users).where(eq(users.email, credentials.email as string));
+    providers: [
+        Credentials({
+            credentials: {
+                email: {},
+                password: {},
+                token: {},
+            },
+            async authorize(credentials) {
+                const [user] = await db
+                    .select()
+                    .from(users)
+                    .where(eq(users.email, credentials.email as string));
 
-            if (!user) {
-                throw new Error("Incorrect credentials");
-            } else {
-                const passwordCorrect = await compare(credentials.password as string, user.password!);
-
-                if (!passwordCorrect) {
+                if (!user) {
                     throw new Error("Incorrect credentials");
-                }
-            }
+                } else {
+                    const passwordCorrect = await compare(
+                        credentials.password as string,
+                        user.password!
+                    );
 
-            return { id: user.id.toString(), email: user.email };
-    }})],
-    
+                    if (!passwordCorrect) {
+                        throw new Error("Incorrect credentials");
+                    }
+
+                    if (user.twoFactorAuthActivated) {
+                        const tokenValid = authenticator.check(
+                            credentials.token as string,
+                            user.twoFactorAuthSecret ?? ""
+                        );
+
+                        if (!tokenValid) {
+                            throw new Error(
+                                "Invalid two-factor authentication token"
+                            );
+                        }
+                    }
+                }
+
+                return { id: user.id.toString(), email: user.email };
+            },
+        }),
+    ],
 });

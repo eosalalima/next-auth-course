@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
-import { get2faSecret } from "./actions";
+import { activate2fa, disable2fa, get2faSecret } from "./actions";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -20,6 +20,7 @@ export default function TwoFactorAuthForm({ twoFactorActivated }: Props) {
     const [isActivated, setIsActivated] = useState(twoFactorActivated);
     const [step, setStep] = useState(1);
     const [code, setCode] = useState("");
+    const [otp, setOtp] = useState("");
 
     const handleEnableClick = async () => {
         const response = await get2faSecret();
@@ -34,10 +35,35 @@ export default function TwoFactorAuthForm({ twoFactorActivated }: Props) {
 
     const handleOTPSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const response = await activate2fa(otp);
+
+        if (response?.error) {
+            toast.error(response.message);
+            return;
+        }
+
+        toast.success("Two-Factor Authentication activated successfully!");
+        setIsActivated(true);
+    };
+
+    const handleDisable2faClick = async () => {
+        await disable2fa();
+        toast.success("Two-Factor Authentication disabled successfully!");
+        setIsActivated(false);
     };
 
     return (
         <div>
+            {!!isActivated && (
+                <Button
+                    className="mt-3"
+                    variant="destructive"
+                    onClick={handleDisable2faClick}
+                >
+                    Disable Two-Factor Authentication
+                </Button>
+            )}
             {!isActivated && (
                 <div>
                     {step === 1 && (
@@ -79,7 +105,12 @@ export default function TwoFactorAuthForm({ twoFactorActivated }: Props) {
                                 Authentication app
                             </p>
 
-                            <InputOTP className="mt-3" maxLength={6}>
+                            <InputOTP
+                                className="mt-3"
+                                maxLength={6}
+                                value={otp}
+                                onChange={setOtp}
+                            >
                                 <InputOTPGroup>
                                     <InputOTPSlot index={0} />
                                     <InputOTPSlot index={1} />
@@ -94,7 +125,7 @@ export default function TwoFactorAuthForm({ twoFactorActivated }: Props) {
                             </InputOTP>
 
                             <div className="flex flex-col gap-2 mt-3">
-                                <Button type="submit">
+                                <Button type="submit" disabled={otp.length < 6}>
                                     Submit and Activate
                                 </Button>
                                 <Button
